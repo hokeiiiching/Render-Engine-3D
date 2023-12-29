@@ -77,6 +77,10 @@ public class DemoViewer {
                 Matrix3 transform = headingTransform.multiply(pitchTransform);
 
 
+                // Rasterization via barycentric coordinates.
+                // Barycentric coordinates: Used to express the position of any point located on the triangle with three scalars
+                // Compute each barycentric coordinate for each pixel that could possibly lie inside the triangle, and discard those that are outside
+                // Note how we started using direct access to image pixels vvv
                 BufferedImage img = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_ARGB);
                 double[] zBuffer = new double[img.getWidth() * img.getHeight()];
                 // init array with extremely far away depths
@@ -104,6 +108,7 @@ public class DemoViewer {
                             ab.x * ac.y - ab.y * ac.x
                     );
 
+                    // Find cosine of angle between side AB and side AC of triangles for shading
                     double angleCos = Math.abs(norm.z);
 
                     double normalLength = Math.sqrt(norm.x * norm.x + norm.y * norm.y + norm.z * norm.z);
@@ -121,6 +126,7 @@ public class DemoViewer {
 
                     for (int y = minY; y <= maxY; y++) {
                         for (int x = minX; x <= maxX; x++) {
+                            // barycentric coordinates calculations
                             double b1 = ((y - v3.y) * (v2.x - v3.x) + (v2.y - v3.y) * (v3.x - x)) / triangleArea;
                             double b2 = ((y - v1.y) * (v3.x - v1.x) + (v3.y - v1.y) * (v1.x - x)) / triangleArea;
                             double b3 = ((y - v2.y) * (v1.x - v2.x) + (v1.y - v2.y) * (v2.x - x)) / triangleArea;
@@ -163,10 +169,11 @@ public class DemoViewer {
     }
 
     // Create sphere approximation for tetrahedron
-    // Done by repeatedly subdividing each triangle into 4 smaller ones and "inflating"
+    // Done by repeatedly subdividing each triangle into 4 smaller ones and "inflating", making the shape look more like a sphere
     public static ArrayList<Triangle> inflate (ArrayList<Triangle> tris) {
         ArrayList<Triangle> result = new ArrayList<>();
         for (Triangle t : tris) {
+            // Impleted via edge subdivision
             Vertex m1 = new Vertex((t.v1.x + t.v2.x)/2, (t.v1.y + t.v2.y)/2, (t.v1.z + t.v2.z)/2);
             Vertex m2 = new Vertex((t.v2.x + t.v3.x)/2, (t.v2.y + t.v3.y)/2, (t.v2.z + t.v3.z)/2);
             Vertex m3 = new Vertex((t.v1.x + t.v3.x)/2, (t.v1.y + t.v3.y)/2, (t.v1.z + t.v3.z)/2);

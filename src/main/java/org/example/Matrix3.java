@@ -1,7 +1,7 @@
 package org.example;
 
 // utility class that will handle matrix-matrix and vector-matrix multiplication
-// To manipulate a 3D point, multiply it with a 3x3 matrix
+// To manipulate a 3D point, represent the point as a 3x1 vector, then transform it by multiplying it with a 3x3 matrix
 public class Matrix3 {
     public double[] values;
 
